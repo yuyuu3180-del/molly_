@@ -1704,548 +1704,244 @@ input[type="file"] { display: none; }
         },1500); 
     }
 
-    /* ============================
-       💚 WeChat Logic (重构版)
-       ============================ */
-    let wcTempImg = "";
-    let pfTempImg = "";
-    let wcFriends = []; 
-    try { 
-        wcFriends = JSON.parse(localStorage.getItem('wc_friends') || "[]"); 
-    } catch(e){ 
-        wcFriends=[]; 
+    /* ========================================================
+   💚 WeChat Logic (2026 最终修复版 - 包含自动压缩)
+   ======================================================== */
+let wcTempImg = "";
+let pfTempImg = "";
+let wcFriends = [];
+let wcChats = [];
+let currentChatUser = null;
+let currentEditingFriend = null;
+let isBlocked = false;
+
+// 初始化：从本地存储读取数据
+function initWeChat() {
+    try {
+        wcFriends = JSON.parse(localStorage.getItem('wc_friends') || "[]");
+        wcChats = JSON.parse(localStorage.getItem('wc_chats') || "[]");
+    } catch (e) {
+        wcFriends = []; wcChats = [];
     }
+}
+initWeChat();
 
-    let wcChats = []; 
-    try { 
-        wcChats = JSON.parse(localStorage.getItem('wc_chats') || "[]"); 
-    } catch(e){ 
-        wcChats=[]; 
+// 统一保存：将内存数据写入本地存储
+function saveAll() {
+    try {
+        localStorage.setItem('wc_friends', JSON.stringify(wcFriends));
+        localStorage.setItem('wc_chats', JSON.stringify(wcChats));
+    } catch (e) {
+        alert("存储空间不足，请尝试删除部分好友或更换更小的头像");
     }
+}
 
-    let currentChatUser = null;
-    let currentEditingFriend = null;
-    let isBlocked = false;
-
-    window.wcOpen = function(){ 
-        openApp('wechat');
-    }
-
-    window.wcClose = function(){ 
-        closeApp('wechat'); 
-        document.getElementById('wc-menu').style.display='none'; 
-    }
-
-    window.wcToggleMenu = function(){ 
-        const m=document.getElementById('wc-menu'); 
-        m.style.display = m.style.display==='flex'?'none':'flex'; 
-    }
-
-    // 🟢 Tab 切换逻辑
-    window.wcSwitchTab = function(tab) {
-        document.querySelectorAll('.wc-tab').forEach(t=>t.classList.remove('active'));
-        document.getElementById('tab-'+tab).classList.add('active');
-
-        const chatList = document.getElementById('wc-chat-list');
-        const contactList = document.getElementById('wc-contact-list');
-
-        const headerTxt = document.getElementById('wc-h-txt');
-        const backArrow = document.getElementById('wc-back-arrow');
-        const plusBtn = document.getElementById('wc-plus-btn');
-
-        if(tab === 'chat') {
-            chatList.style.display = 'block';
-            contactList.style.display = 'none';
-            headerTxt.innerText = '消息';
-            backArrow.style.display = 'inline'; 
-            plusBtn.style.visibility = 'visible'; 
-            wcRenderChats();
-        } else if(tab === 'contact') {
-            chatList.style.display = 'none';
-            contactList.style.display = 'block';
-            headerTxt.innerText = '通讯录';
-            backArrow.style.display = 'none';
-            plusBtn.style.visibility = 'hidden'; 
-            wcRenderContacts();
-        }
-    }
-
-    // 添加好友
-    window.wcShowAdd = function(){ 
-        document.getElementById('wc-menu').style.display='none'; 
-        document.getElementById('wc-modal-add').style.display='flex'; 
-        wcTempImg=""; 
-        const el=document.getElementById('wc-new-av'); 
-        el.style.backgroundImage='none'; 
-        el.classList.remove('has-img'); 
-        document.getElementById('wc-new-name').value=""; 
-    }
-
-    window.wcHideAdd = function(){ 
-        document.getElementById('wc-modal-add').style.display='none'; 
-    }
-
-    window.wcHandleAv = function(i){ 
-        const f=i.files[0]; 
-        if(!f) return; 
-        const r=new FileReader(); 
-        r.onload=(e)=>{ 
-            wcTempImg=e.target.result; 
-            const el=document.getElementById('wc-new-av'); 
-            el.style.backgroundImage='url('+wcTempImg+')'; 
-            el.classList.add('has-img'); 
-        }; 
-        r.readAsDataURL(f); 
-    }
-
-    window.wcConfirmAdd = function(){
-        const n=document.getElementById('wc-new-name').value;
-        if(!n){ alert("请输入备注"); return; }
-        if(!wcFriends) wcFriends = [];
-
-        // 生成唯一ID
-        const newId = Date.now().toString(); 
-
-        const newFriend = { 
-            id: newId, 
-            name:n, 
-            alias:n, 
-            av:wcTempImg || "", 
-            isStarred:false, 
-            desc:"", 
-            sign:"" 
-        };
-        wcFriends.push(newFriend);
-
-        const chatObj = { 
-            id: newId, 
-            name: n, 
-            av: wcTempImg || "", 
-            last: "", 
-            time: "刚刚", 
-            isPinned:false, 
-            messages:[] 
-        };
-
-        if(!wcChats.some(c=>c.id === newId)) { 
-            wcChats.unshift(chatObj); 
-        }
-
-        saveAll();
-        window.wcHideAdd();
-
-        const isContactTab = document.getElementById('tab-contact').classList.contains('active');
-        if(isContactTab) wcRenderContacts(); 
-        else wcRenderChats();
-
-        setTimeout(() => alert("已添加好友"), 100);
-    }
-
-    window.wcShowNewChat = function(){
-        document.getElementById('wc-menu').style.display='none';
-        const list = document.getElementById('wc-friend-select');
-        list.innerHTML = "";
-
-        if(!wcFriends || wcFriends.length===0){ 
-            list.innerHTML="<div style='text-align:center;color:#ccc;margin-top:20px'>暂无好友</div>"; 
-        } else {
-            wcFriends.forEach((f)=>{
-                const d=document.createElement('div'); 
-                d.className='wc-sel-item';
-                d.setAttribute('data-name', f.name);
-                d.innerHTML='<div class="wc-sel-check"></div><div style="font-size:14px; font-weight:500; color:#333">'+(f.alias||f.name)+'</div>';
-                d.onclick = function() { this.classList.toggle('selected'); };
-                list.appendChild(d);
-            });
-        }
-        document.getElementById('wc-modal-chat').style.display='flex';
-    }
-
-    window.wcConfirmChat = function(){
-        const items = document.querySelectorAll('.wc-sel-item.selected');
-        if(items.length === 0){ alert("请至少选择一位好友"); return; }
-        const count = items.length;
-        wcChats.unshift({ 
-            name: (count>1?"群聊 ("+count+"人)":items[0].getAttribute('data-name')), 
-            av:"", 
-            last:"你发起了群聊", 
-            time:"刚刚", 
-            isPinned:false, 
-            messages:[] 
-        });
-        saveAll();
-        wcRenderChats();
-        document.getElementById('wc-modal-chat').style.display='none';
-    }
-
-    // 🟢 渲染消息列表 - 优化左滑逻辑
-    window.wcRenderChats = function(){
-        const el = document.getElementById('wc-chat-list');
-        // 先按置顶排序，再按时间排序
-        wcChats.sort((a,b) => {
-            if(a.isPinned && !b.isPinned) return -1;
-            if(!a.isPinned && b.isPinned) return 1;
-            return 0;
-        });
-
-        el.innerHTML="";
-        if(!wcChats || wcChats.length===0) { 
-            el.innerHTML='<div class="wc-empty">✨ 暂无消息<br>点击右上角 + 发起群聊</div>'; 
-            return; 
-        }
-
-        wcChats.forEach((c, index)=>{
-            const d=document.createElement('div'); 
-            d.className = 'wc-list-item' + (c.isPinned ? ' pinned' : '');
-            d.setAttribute('data-index', index);
-
-            let displayName = c.name;
-            const f = wcFriends.find(x => x.id === c.id || x.name === c.name);
-            if(f && f.alias) displayName = f.alias;
-
-            const avStyle = c.av ? 'background-image:url('+c.av+')' : 'background:#eee';
-            const lastMsg = c.last ? c.last : '<span style="color:red">[新会话]</span>';
-            const pinMark = c.isPinned ? '<span style="color:#07c160;font-size:10px;margin-right:4px;">[置顶]</span>' : '';
-
-            d.innerHTML = `
-                <div class="wc-avatar" style="${avStyle}"></div>
-                <div class="wc-info">
-                    <div class="wc-name">${displayName}</div>
-                    <div class="wc-last-msg">${pinMark}${lastMsg}</div>
-                </div>
-                <div class="wc-time">${c.time}</div>
-                <!-- 左滑按钮容器 -->
-                <div class="wc-swipe-actions">
-                    <div class="wc-swipe-btn ${c.isPinned ? 'unpin' : 'pin'}" data-action="${c.isPinned ? 'unpin' : 'pin'}" data-index="${index}">
-                        ${c.isPinned ? '取消置顶' : '置顶'}
-                    </div>
-                    <div class="wc-swipe-btn delete" data-action="delete" data-index="${index}">
-                        删除
-                    </div>
-                </div>
-            `;
-
-            d.onclick = function() { window.openChat(c, displayName); };
-
-            // 👉 优化左滑逻辑
-            let startX = 0;
-            let isSwiping = false;
-            let currentX = 0;
-
-            d.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                currentX = startX;
-                isSwiping = false;
-
-                // 关闭其他打开的滑动项
-                document.querySelectorAll('.wc-list-item.swiping').forEach(item => {
-                    if(item !== d) {
-                        item.classList.remove('swiping');
-                    }
-                });
-            });
-
-            d.addEventListener('touchmove', e => {
-                currentX = e.touches[0].clientX;
-                const diffX = startX - currentX;
-
-                if(Math.abs(diffX) > 5) {
-                    isSwiping = true;
-                    e.preventDefault();
-                }
-
-                if(diffX > 0) {
-                    // 左滑，显示按钮
-                    const swipeActions = d.querySelector('.wc-swipe-actions');
-                    if(swipeActions) {
-                        let translateX = Math.min(diffX, 160);
-                        swipeActions.style.right = `-${160 - translateX}px`;
-                    }
-                }
-            });
-
-            d.addEventListener('touchend', e => {
-                const diffX = startX - currentX;
-
-                if(isSwiping && diffX > 50) {
-                    // 左滑超过50px，显示按钮
-                    d.classList.add('swiping');
-                } else if(isSwiping && diffX < -50) {
-                    // 右滑，隐藏按钮
-                    d.classList.remove('swiping');
-                    const swipeActions = d.querySelector('.wc-swipe-actions');
-                    if(swipeActions) {
-                        swipeActions.style.right = '-160px';
-                    }
-                } else if(!isSwiping) {
-                    // 点击操作
-                    // 不在这里处理点击，由onclick处理
-                }
-
-                // 重置滑动状态
-                isSwiping = false;
-            });
-
-            // 按钮点击事件
-            const pinBtn = d.querySelector('.wc-swipe-btn[data-action="pin"], .wc-swipe-btn[data-action="unpin"]');
-            const deleteBtn = d.querySelector('.wc-swipe-btn[data-action="delete"]');
-
-            if(pinBtn) {
-                pinBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const idx = this.getAttribute('data-index');
-                    if(wcChats[idx]) {
-                        wcChats[idx].isPinned = !wcChats[idx].isPinned;
-                        saveAll();
-                        wcRenderChats();
-                    }
-                    d.classList.remove('swiping');
-                    const swipeActions = d.querySelector('.wc-swipe-actions');
-                    if(swipeActions) {
-                        swipeActions.style.right = '-160px';
-                    }
-                });
+// 图片压缩工具：解决点击“添加”卡死、失灵的核心方案
+async function compressAv(base64Str) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = base64Str;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 200; // 压缩至200像素，保证清晰且不占用空间
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+                if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+            } else {
+                if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
             }
-
-            if(deleteBtn) {
-                deleteBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const idx = this.getAttribute('data-index');
-                    if(confirm('确定删除此聊天吗？')) {
-                        wcChats.splice(idx, 1);
-                        saveAll();
-                        wcRenderChats();
-                    }
-                    d.classList.remove('swiping');
-                    const swipeActions = d.querySelector('.wc-swipe-actions');
-                    if(swipeActions) {
-                        swipeActions.style.right = '-160px';
-                    }
-                });
-            }
-
-            el.appendChild(d);
-        });
-    }
-
-    // 渲染通讯录列表
-    window.wcRenderContacts = function(){
-        const el = document.getElementById('wc-contact-list');
-        el.innerHTML = "";
-
-        if(!wcFriends || wcFriends.length===0) { 
-            el.innerHTML='<div class="wc-empty">暂无联系人</div>'; 
-            return; 
-        }
-
-        wcFriends.sort((a,b) => {
-            if(a.isStarred !== b.isStarred) return b.isStarred - a.isStarred;
-            return (a.alias||a.name).localeCompare(b.alias||b.name, 'zh');
-        });
-
-        const stars = wcFriends.filter(f => f.isStarred);
-        const others = wcFriends.filter(f => !f.isStarred);
-
-        function addContact(f) {
-            const d = document.createElement('div'); 
-            d.className='contact-item';
-            const avStyle = f.av ? 'background-image:url('+f.av+')' : 'background:#eee';
-            d.innerHTML = '<div class="c-av-small" style="'+avStyle+'"></div><div class="c-name-text">'+(f.alias||f.name)+'</div>';
-            d.onclick = function() { window.openProfile(f); }; 
-            el.appendChild(d);
-        }
-
-        if(stars.length > 0) {
-            const t = document.createElement('div'); 
-            t.className='contact-group-title'; 
-            t.innerText = "星标朋友"; 
-            el.appendChild(t);
-            stars.forEach(addContact);
-        }
-
-        if(others.length > 0) {
-            const t = document.createElement('div'); 
-            t.className='contact-group-title'; 
-            t.innerText = "全部联系人"; 
-            el.appendChild(t);
-            others.forEach(addContact);
-        }
-    }
-
-    // 资料编辑
-    window.openProfile = function(friend) {
-        currentEditingFriend = friend;
-        pfTempImg = friend.av;
-        document.getElementById('p-profile').style.display = 'flex';
-        const avEl = document.getElementById('pf-av');
-        if(friend.av) { 
-            avEl.style.backgroundImage='url('+friend.av+')'; 
-            avEl.classList.add('has-img'); 
-        } else { 
-            avEl.style.backgroundImage='none'; 
-            avEl.classList.remove('has-img'); 
-        }
-        document.getElementById('pf-name').value = friend.name;
-        document.getElementById('pf-alias').value = friend.alias || "";
-        document.getElementById('pf-desc').value = friend.desc || "";
-        document.getElementById('pf-sign').value = friend.sign || "";
-        const starSwitch = document.getElementById('pf-star');
-        if(friend.isStarred) starSwitch.classList.add('on'); 
-        else starSwitch.classList.remove('on');
-    }
-
-    window.wcHandleProfileAv = function(i){
-        const f=i.files[0]; 
-        if(!f) return;
-        const r=new FileReader();
-        r.onload=(e)=>{ 
-            pfTempImg=e.target.result; 
-            const el=document.getElementById('pf-av'); 
-            el.style.backgroundImage='url('+pfTempImg+')'; 
-            el.classList.add('has-img'); 
+            canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); // 80% 质量压缩
         };
-        r.readAsDataURL(f);
-    }
+    });
+}
 
-    window.saveProfile = function() {
-        if(!currentEditingFriend) return;
-        currentEditingFriend.av = pfTempImg;
-        currentEditingFriend.name = document.getElementById('pf-name').value;
-        currentEditingFriend.alias = document.getElementById('pf-alias').value;
-        currentEditingFriend.desc = document.getElementById('pf-desc').value;
-        currentEditingFriend.sign = document.getElementById('pf-sign').value;
-        currentEditingFriend.isStarred = document.getElementById('pf-star').classList.contains('on');
-        saveAll();
-        document.getElementById('p-profile').style.display='none';
-        wcRenderContacts(); 
+// 基础 UI 操作
+window.wcOpen = function() { openApp('wechat'); wcRenderChats(); }
+window.wcClose = function() { 
+    closeApp('wechat'); 
+    document.getElementById('wc-menu').style.display='none'; 
+}
+window.wcToggleMenu = function() {
+    const m = document.getElementById('wc-menu');
+    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// Tab 切换逻辑
+window.wcSwitchTab = function(tab) {
+    document.querySelectorAll('.wc-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    const chatList = document.getElementById('wc-chat-list');
+    const contactList = document.getElementById('wc-contact-list');
+    const headerTxt = document.getElementById('wc-h-txt');
+
+    if (tab === 'chat') {
+        chatList.style.display = 'block';
+        contactList.style.display = 'none';
+        headerTxt.innerText = '消息';
         wcRenderChats();
-        alert("保存成功");
+    } else {
+        chatList.style.display = 'none';
+        contactList.style.display = 'block';
+        headerTxt.innerText = '通讯录';
+        wcRenderContacts();
     }
+}
 
-    // 聊天设置逻辑
-    window.sSearch = function() {
-        const k = prompt("请输入查找内容：");
-        if(!k) return;
-        if(!currentChatUser.messages) { alert("无消息记录"); return; }
-        const hits = currentChatUser.messages.filter(m => m.text.includes(k));
-        if(hits.length > 0) alert("找到 " + hits.length + " 条记录：\\n" + hits[0].text + "...");
-        else alert("未找到相关记录");
+// 添加好友逻辑
+window.wcShowAdd = function() {
+    document.getElementById('wc-menu').style.display = 'none';
+    document.getElementById('wc-modal-add').style.display = 'flex';
+    wcTempImg = ""; 
+    const el = document.getElementById('wc-new-av');
+    el.style.backgroundImage = 'none';
+    el.classList.remove('has-img');
+    document.getElementById('wc-new-name').value = "";
+}
+
+window.wcHandleAv = function(i) {
+    const f = i.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = async (e) => {
+        wcTempImg = await compressAv(e.target.result); // 压缩图片
+        const el = document.getElementById('wc-new-av');
+        el.style.backgroundImage = `url(${wcTempImg})`;
+        el.classList.add('has-img');
+    };
+    r.readAsDataURL(f);
+}
+
+window.wcConfirmAdd = function() {
+    const n = document.getElementById('wc-new-name').value.trim();
+    if (!n) { alert("请输入备注名称"); return; }
+    
+    const newId = "u_" + Date.now();
+    const newFriend = { id: newId, name: n, alias: n, av: wcTempImg, isStarred: false, desc: "", sign: "" };
+    wcFriends.push(newFriend);
+
+    // 同步初始化聊天列表
+    wcChats.unshift({ id: newId, name: n, av: wcTempImg, last: "已成功添加", time: "刚刚", isPinned: false, messages: [] });
+
+    saveAll();
+    document.getElementById('wc-modal-add').style.display = 'none';
+    wcRenderContacts();
+    wcRenderChats();
+    wcSwitchTab('chat'); // 自动跳到消息列表
+}
+
+// 通讯录及个人资料逻辑
+window.openProfile = function(friend) {
+    currentEditingFriend = friend;
+    pfTempImg = friend.av || ""; 
+    document.getElementById('p-profile').style.display = 'flex';
+    
+    const avEl = document.getElementById('pf-av');
+    avEl.style.backgroundImage = pfTempImg ? `url(${pfTempImg})` : 'none';
+    pfTempImg ? avEl.classList.add('has-img') : avEl.classList.remove('has-img');
+
+    document.getElementById('pf-name').value = friend.name || "";
+    document.getElementById('pf-alias').value = friend.alias || "";
+    document.getElementById('pf-desc').value = friend.desc || "";
+    document.getElementById('pf-sign').value = friend.sign || "";
+    
+    const starSwitch = document.getElementById('pf-star');
+    friend.isStarred ? starSwitch.classList.add('on') : starSwitch.classList.remove('on');
+}
+
+window.wcHandleProfileAv = function(i) {
+    const f = i.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = async (e) => {
+        pfTempImg = await compressAv(e.target.result); // 压缩图片
+        const el = document.getElementById('pf-av');
+        el.style.backgroundImage = `url(${pfTempImg})`;
+        el.classList.add('has-img');
+    };
+    r.readAsDataURL(f);
+}
+
+window.saveProfile = function() {
+    if (!currentEditingFriend) return;
+    const f = wcFriends.find(x => x.id === currentEditingFriend.id);
+    if (f) {
+        f.av = pfTempImg;
+        f.name = document.getElementById('pf-name').value;
+        f.alias = document.getElementById('pf-alias').value;
+        f.desc = document.getElementById('pf-desc').value;
+        f.sign = document.getElementById('pf-sign').value;
+        f.isStarred = document.getElementById('pf-star').classList.contains('on');
+        
+        const c = wcChats.find(x => x.id === f.id);
+        if(c) { c.av = f.av; c.name = f.alias || f.name; }
     }
+    saveAll();
+    document.getElementById('p-profile').style.display = 'none';
+    wcRenderContacts();
+    wcRenderChats();
+    alert("保存成功");
+}
 
-    window.sLinkGroup = function() { alert("暂无群聊可关联"); }
-    window.sBindWorld = function() { prompt("请输入世界书 ID："); alert("绑定成功 (模拟)"); }
-    window.sBindPreset = function() { alert("已重置为默认预设"); }
-    window.sExport = function() { alert("聊天记录已导出 (Mock)"); }
+// 列表渲染函数
+window.wcRenderChats = function() {
+    const el = document.getElementById('wc-chat-list');
+    if(!el) return;
+    el.innerHTML = "";
+    wcChats.forEach(c => {
+        const d = document.createElement('div');
+        d.className = `wc-list-item ${c.isPinned ? 'pinned' : ''}`;
+        d.innerHTML = `
+            <div class="wc-avatar" style="background-image:url(${c.av || ''})"></div>
+            <div class="wc-info">
+                <div class="wc-name">${c.name}</div>
+                <div class="wc-last-msg">${c.last || ''}</div>
+            </div>
+            <div class="wc-time">${c.time}</div>
+        `;
+        d.onclick = () => window.openChat(c, c.name);
+        el.appendChild(d);
+    });
+}
 
-    window.sHandleBg = function(i) {
-        const f=i.files[0]; 
-        if(!f) return;
-        const r=new FileReader();
-        r.onload=(e)=>{ 
-            document.querySelector('.c-body').style.backgroundImage = 'url('+e.target.result+')'; 
-            alert("壁纸设置成功"); 
-        };
-        r.readAsDataURL(f);
-    }
+window.wcRenderContacts = function() {
+    const el = document.getElementById('wc-contact-list');
+    if(!el) return;
+    el.innerHTML = "";
+    wcFriends.sort((a,b)=> (b.isStarred-a.isStarred)).forEach(f => {
+        const d = document.createElement('div');
+        d.className = 'contact-item';
+        d.innerHTML = `
+            <div class="c-av-small" style="background-image:url(${f.av || ''})"></div>
+            <div class="c-name-text">${f.alias || f.name}</div>
+        `;
+        d.onclick = () => window.openProfile(f);
+        el.appendChild(d);
+    });
+}
 
-    window.sClear = function() {
-        if(confirm("确定要清空聊天记录吗？")) {
-            document.getElementById('c-msg-list').innerHTML = '';
-            currentChatUser.messages = [];
-            currentChatUser.last = "";
-            saveAll();
-            wcRenderChats();
-        }
-    }
+// 聊天窗控制
+window.openChat = function(chatObj, title) {
+    currentChatUser = chatObj;
+    document.getElementById('wc-chat-window').style.display = 'flex';
+    document.getElementById('c-title').innerText = title;
+    const list = document.getElementById('c-msg-list');
+    list.innerHTML = "";
+    if(chatObj.messages) chatObj.messages.forEach(m => addBubbleUI(m.text, m.isMe));
+}
 
-    window.sDelete = function() {
-        if(confirm("确定删除该聊天？")) {
-            wcChats = wcChats.filter(c => c.name !== currentChatUser.name);
-            saveAll();
-            window.closeChat();
-            wcRenderChats();
-        }
-    }
+window.closeChat = function() { document.getElementById('wc-chat-window').style.display = 'none'; }
+window.sendMsg = function() {
+    const input = document.getElementById('c-input');
+    const val = input.value.trim();
+    if (!val) return;
+    addBubble(val, true);
+    input.value = "";
+    if(window.handleInput) window.handleInput(input);
+}
 
-    window.sBlock = function() {
-        isBlocked = true;
-        alert("已将该用户加入黑名单。");
-        document.getElementById('c-input').placeholder = "对方已拒收您的消息";
-        document.getElementById('c-input').disabled = true;
-    }
 
-    window.handleInput = function(el) {
-        const btnPlus = document.getElementById('btn-plus');
-        const btnBone = document.getElementById('btn-bone');
-        const btnSend = document.getElementById('btn-send');
-        if(!btnPlus || !btnSend) return; 
-        if (el.value.trim().length > 0) {
-            btnPlus.style.display = 'none'; 
-            btnBone.style.display = 'none';
-            btnSend.style.display = 'block';
-        } else {
-            btnPlus.style.display = 'block'; 
-            btnBone.style.display = 'flex';
-            btnSend.style.display = 'none';
-        }
-    }
-
-    window.openChat = function(chatObj, displayTitle) {
-        currentChatUser = chatObj;
-        isBlocked = false; 
-        document.getElementById('wc-chat-window').style.display = 'flex';
-        document.getElementById('c-title').innerText = displayTitle || chatObj.name;
-        const pFoot = document.getElementById('p-foot');
-        if(pFoot) { 
-            pFoot.innerHTML = '<div style="text-align:center;color:#999;font-size:12px;padding:20px;">暂无动态<br>发条消息试试?</div>'; 
-        }
-
-        const list = document.getElementById('c-msg-list');
-        list.innerHTML = ''; 
-        if(chatObj.messages && chatObj.messages.length > 0) {
-            chatObj.messages.forEach(msg => {
-                addBubbleUI(msg.text, msg.isMe, false);
-            });
-        }
-
-        document.getElementById('c-input').disabled = false;
-        document.getElementById('c-input').placeholder = "输入消息...";
-    }
-
-    window.closeChat = function() {
-        document.getElementById('wc-chat-window').style.display = 'none';
-        document.getElementById('p-settings').style.display = 'none';
-        currentChatUser = null;
-    }
-
-    window.togglePanel = function(id) { 
-        const p = document.getElementById('p-'+id); 
-        if(p) p.classList.toggle('open'); 
-    }
-
-    window.toggleFootprint = function() { 
-        const fp = document.getElementById('p-foot'); 
-        if(fp) fp.style.display = fp.style.display==='flex'?'none':'flex'; 
-    }
-
-    window.openSettings = function() { 
-        document.getElementById('p-settings').style.display = 'flex'; 
-    }
-
-    window.sendMsg = function() {
-        if(isBlocked) { 
-            alert("消息已发出，但被对方拒收了。"); 
-            return; 
-        }
-        const input = document.getElementById('c-input');
-        const txt = input.value;
-        if(!txt) return;
-        addBubble(txt, true);
-        input.value = "";
-        window.handleInput(input);
-    }
 
        window.triggerReply = async function() {
     if(typeof isBlocked !== 'undefined' && isBlocked) return;
