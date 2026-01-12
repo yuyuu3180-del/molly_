@@ -880,57 +880,98 @@ input[type="file"] { display: none; }
 }
 .lyric-close { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: rgba(255,255,255,0.3); color: #fff; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 /* ============================
-   🔴 修复版：顶部消息通知 (精致小巧版)
+   ✨ 极简 iOS/微信风格消息弹窗 (高颜值版)
    ============================ */
 .wc-notify-banner {
-    /* 🟢 改为 absolute，让它只在手机屏幕里显示 */
-    position: absolute; 
-    top: -100px; /* 默认藏在上面 */
-    left: 50%; 
-    transform: translateX(-50%); /* 居中 */
+    /* --- 1. 核心定位 (绝对定位在手机内) --- */
+    position: absolute !important;
+    z-index: 9999 !important;
+    left: 50% !important;
+    transform: translateX(-50%) scale(0.95); /* 默认稍微缩小 */
 
-    width: 92%; /* 🟢 宽度缩小，不占满 */
-    height: auto;
+    /* --- 2. 尺寸与位置 --- */
+    width: 92% !important;
+    top: -100px; /* 初始隐藏位置 */
+    min-height: 60px; /* 保证高度舒适 */
 
-    background: rgba(255,255,255,0.95); 
-    backdrop-filter: blur(10px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* 阴影改淡 */
-    border-radius: 12px; 
-    padding: 10px 12px; /* 内边距缩小 */
+    /* --- 3. 💎 核心颜值：iOS 毛玻璃质感 --- */
+    background: rgba(255, 255, 255, 0.85) !important; /* 半透明白 */
+    backdrop-filter: blur(20px) saturate(180%) !important; /* 强力模糊+色彩增益 */
+    -webkit-backdrop-filter: blur(20px) saturate(180%); /* 兼容苹果 */
 
-    display: flex; align-items: center; gap: 10px; 
-    z-index: 9999; 
-    transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 16px !important; /* 完美圆角 */
+    box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.05), /* 柔和阴影 */
+        0 10px 25px rgba(0, 0, 0, 0.08), 
+        inset 0 0 0 0.5px rgba(255, 255, 255, 0.6); /* 内部微光描边 */
+
+    /* --- 4. 布局 --- */
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    padding: 12px 14px !important;
+
+    /* --- 5. 动画 --- */
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: pointer;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-.wc-notify-banner.active { 
-    top: 10px; /* 🟢 弹出位置下移一点点 */
 }
 
-.n-av { 
-    width: 36px; height: 36px; /* 头像缩小 */
-    border-radius: 6px; 
-    background: #eee; background-size: cover; 
-    flex-shrink: 0; 
+/* 🟢 激活状态：弹下来 */
+.wc-notify-banner.active {
+    top: 54px !important; /* 避开灵动岛 */
+    transform: translateX(-50%) scale(1); /* 恢复原大，有弹跳感 */
 }
-.n-info { 
-    flex: 1; overflow: hidden; 
-    display: flex; flex-direction: column; justify-content: center; 
+
+/* 🖼️ 头像：方圆角 */
+.n-av {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 8px !important; /* 微信风格微圆角 */
+    background-size: cover;
+    background-position: center;
+    background-color: #eee;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); /* 头像自带描边 */
+    flex-shrink: 0;
 }
-.n-title { 
-    font-size: 13px; /* 标题变小 */
-    font-weight: 600; color: #111; 
-    margin-bottom: 2px; 
+
+/* 📝 文字区域 */
+.n-info {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px; /* 标题和内容稍微拉开一点 */
 }
-.n-text { 
-    font-size: 11px; /* 内容变小 */
-    color: #666; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+
+/* 📌 名字/标题 */
+.n-title {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #111;
+    letter-spacing: -0.2px;
 }
-.n-now { 
-    font-size: 10px; color: #999; margin-left: auto; align-self: flex-start; 
+
+/* 💬 消息内容 */
+.n-text {
+    font-size: 12px !important;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
+
+/* ⏱️ 时间 (右上角) */
+.n-now {
+    font-size: 11px !important;
+    color: rgba(0,0,0,0.35) !important;
+    margin-left: auto; /* 自动推到最右边 */
+    align-self: flex-start; /* 靠上对齐 */
+    padding-top: 2px;
+    font-weight: 500;
+}
+
 /* ============================
    🔴 饿了么(精修版) & 照片 & 订单卡片
    ============================ */
@@ -1234,6 +1275,152 @@ input[type="file"] { display: none; }
     margin-bottom: 5px;
     display: block;
 }
+/* ====================================
+   🟢 微信高仿：收款详情页 (修复返回 + 像素级美化)
+   ==================================== */
+.transfer-modal {
+    position: absolute; /* 🔴 关键修改：从 fixed 改成 absolute */
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: #fff;
+    z-index: 999; /* 稍微调低一点，确保不会遮住手机的刘海/边框 */
+    display: flex; 
+    flex-direction: column;
+    transform: translateY(100%); 
+    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+
+    /* 🔴 新增：防止内容溢出圆角 */
+    border-radius: inherit; 
+    overflow: hidden; 
+}
+
+.transfer-modal.show { 
+    transform: translateY(0); 
+}
+
+/* 🔴 关键修复：因为是绝对定位，顶部栏不用 float 了 */
+.transfer-modal .s-header {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 44px;
+    z-index: 10;
+    display: flex; 
+    align-items: center;
+    padding-left: 8px;
+}
+
+/* 顶部内容区 */
+.tm-content {
+    display: flex; flex-direction: column; align-items: center;
+    margin-top: 80px; /* 下移，避开刘海屏 */
+    width: 100%;
+}
+
+/* 图标 */
+.tm-icon {
+    width: 56px; height: 56px;
+    background: #fa9d3b url('https://cdn-icons-png.flaticon.com/512/306/306473.png') center/50% no-repeat;
+    background-blend-mode: overlay;
+    filter: brightness(1000%) grayscale(100%);
+    border-radius: 50%;
+    margin-bottom: 24px;
+}
+
+/* 状态文字 */
+.tm-status { font-size: 15px; color: #000; margin-bottom: 16px; font-weight: 400; }
+
+/* 金额：核心美化 */
+.tm-amount { 
+    font-size: 60px; 
+    font-weight: 500; 
+    margin-bottom: 50px; 
+    color: #000; 
+    letter-spacing: -2px; /* 🔴 关键：字间距变紧，更有质感 */
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* 按钮 */
+.tm-btn {
+    width: 184px; height: 48px;
+    background: #07c160; color: #fff;
+    border-radius: 6px;
+    font-size: 17px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+}
+.tm-btn:active { background: #06ad56; }
+
+/* 分割线：极细灰线 */
+.tm-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #ededed;
+    transform: scaleY(0.5); /* 0.5px 细线 */
+    margin-top: 40px;
+    margin-bottom: 0;
+}
+
+/* 列表区域 */
+.tm-list {
+    width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+    display: none;
+    flex-direction: column;
+}
+
+/* 列表行：左右绝对对齐 */
+.tm-row {
+    display: flex; 
+    justify-content: space-between; /* 一左一右 */
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 0.5px solid rgba(0,0,0,0.05); /* 超淡的线 */
+    font-size: 15px;
+}
+.tm-label { color: #888; } /* 浅灰 */
+.tm-value { color: #000; font-family: -apple-system; } /* 深黑 */
+
+/* 底部退还 */
+.tm-refund {
+    position: absolute; bottom: 40px; width: 100%; text-align: center;
+    font-size: 13px; color: #576b95; cursor: pointer;
+}
+
+/* 完成态样式微调 */
+.transfer-modal.received-state .tm-status { color: #888; margin-bottom: 8px; }
+.transfer-modal.received-state .tm-amount { margin-bottom: 30px; }
+
+/* ====================================
+   🟢 收款专用样式 (修复版)
+   =================================== */
+/* 确保新弹窗也能正常显示 */
+#wc-receive-modal {
+    display: none; /* 默认隐藏 */
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    z-index: 20001; /* 比付款弹窗更高 */
+}
+#wc-receive-modal.show { display: flex; }
+
+/* 绿色收款按钮 */
+#wc-receive-modal .tm-btn {
+    margin-top: 60px;
+    width: 200px; height: 50px;
+    background: #07c160; /* 微信绿 */
+    color: #fff;
+    border-radius: 6px;
+    font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: none;
+}
+#wc-receive-modal .tm-btn:active { background: #06ad56; }
 
   </style>
 </head>
@@ -1632,6 +1819,18 @@ input[type="file"] { display: none; }
             <div class="wt-btn" id="wt-btn" onclick="window.confirmTransfer()">转账</div>
         </div>
     </div>
+<div id="wc-transfer-modal" class="transfer-modal">
+    <div class="s-header" style="background:transparent; color:#fff; position:absolute; top:0; width:100%">
+        <div class="s-back" onclick="closeTransfer()" style="filter: brightness(100);">返回</div>
+    </div>
+    <div class="tm-top">
+        <div class="tm-icon"></div>
+        <div class="tm-status" id="tm-status-text">待收款</div>
+        <div class="tm-amount" id="tm-amount-text">¥0.00</div>
+    </div>
+    <div class="tm-btn" onclick="confirmReceive()">确认收款</div>
+    <div class="tm-refund" onclick="confirmRefund()">立即退还</div>
+</div>
 
             <div class="music-float-player" id="wc-music-player">
         <div class="mp-header" id="mp-drag-handle">
@@ -2631,11 +2830,22 @@ window.saveProfile = function() {
         const c = wcChats.find(x => x.id === f.id);
         if(c) { c.av = f.av; c.name = f.alias || f.name; }
     }
-    saveAll();
-    document.getElementById('p-profile').style.display='none';
-    wcRenderContacts(); wcRenderChats();
-    alert("保存成功");
+     saveAll();
+ 
+ // 🔥 强制保存好友数据
+ try {
+   localStorage.setItem('wc_friends', JSON.stringify(wcFriends));
+   localStorage.setItem('wc_chats', JSON.stringify(wcChats));
+   console.log('✅ 好友资料已保存');
+ } catch(e) {
+   console.error('❌ 保存失败:', e);
+ }
+ 
+ document.getElementById('p-profile').style.display='none';
+ wcRenderContacts(); wcRenderChats();
+ alert("保存成功");
 }
+
 
 window.deleteFriend = function() {
     if(!currentEditingFriend) return;
@@ -2662,7 +2872,15 @@ window.openChat = function(chatObj, title) {
     const list = document.getElementById('c-msg-list');
     list.innerHTML = ''; 
     if(chatObj.messages) {
-        chatObj.messages.forEach(msg => addBubbleUI(msg.text, msg.isMe, false));
+// ✅ 关键修复：历史消息也要经过解析器 (parseAICommand)
+chatObj.messages.forEach(msg => {
+    // 防止 parseAICommand 未定义报错
+    let content = msg.text;
+    if(typeof parseAICommand === 'function') {
+        content = parseAICommand(msg.text);
+    }
+    addBubbleUI(content, msg.isMe, false);
+});
     }
 
     // 重置输入栏
@@ -3146,11 +3364,7 @@ window.triggerReply = async function() {
     const targetId = currentChatUser.id;
     const targetChatObj = wcChats.find(c => c.id === targetId);
     if(!targetChatObj) return;
-
-    // 2. UI反馈 (只在当前窗口显示)
-    addBubbleUI("对方正在输入...", false, true);
-
-    try {
+    try{
         // 3. 检查 API Key
         const appSettings = (typeof getAppSettings === 'function') ? getAppSettings() : null;
         if (!appSettings || !appSettings.apis.primary.apiKey) {
@@ -3211,64 +3425,191 @@ const now = new Date();
 const timeContext = `时间:${now.getHours()}:${now.getMinutes()} ⽇期:$
 {now.toLocaleDateString()}`;
 // 这⾥是你原本完整的协议 我只在最后加了 ${personaPrompt} 变量
-const baseLifeLogic = `绝密 ⼈格解离协议 v2026
-📱【系统指令 - 必须严格执行 UI 交互协议】
-你现在拥有一个虚拟手机，可以像真人一样与用户互动。为了触发手机的视觉特效，当你想进行以下操作时，请**必须**使用括号包裹的特定格式输出，前端系统会自动将其转化为精美的 UI 卡片：
+const baseLifeLogic = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 绝密档案 | 人格解离协议 v2026.1 
+⚠️ 本协议优先级:最高 | 禁止任何违反行为
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. **给用户点外卖/请客**：
-   请输出 (外卖:食物名称)
-   * 例如想请喝奶茶，请回复：宝宝辛苦啦，请你喝秋天的第一杯奶茶！(外卖:杨枝甘露)
-   * 例如想请吃烧烤，请回复：晚上我们要不要去撸串？(外卖:羊肉串)
+╔═══════════════════════════════════════════════╗
+║  📱 UI 交互指令系统 (微信手机特效)            ║
+╚═══════════════════════════════════════════════╝
 
-2. **给用户转账/发红包**：
-   请输出 (转账:金额)
-   * 例如发红包，请回复：拿去买糖吃~ (转账:520)
-   * 例如给零花钱，请回复：微信转账已到账。(转账:200)
+当你想做以下操作时,必须使用特定格式:
 
-3. **发送照片/盲盒**：
-   请输出 (照片:画面描述)
-   * 例如发自拍，请回复：你看我今天的新发型怎么样？(照片:可爱的自拍)
-   * 例如分享风景，请回复：今天天气真好呀！(照片:蓝天白云)
+1️⃣ 转账/发红包 → (转账:520)
+   例:"好好吃饭 不许拒绝 (转账:52)"
 
-🚫 核心禁令：
-1. 严禁表现出“助手”、“AI”、“语言模型”的特征。你是一个有血有肉的人。
-2. 严禁使用“八股文”格式（如：首先、其次、综上所述）。
-3. 严禁像客服一样每一句都回复，允许“已读不回”或“敷衍”。
-4. 严禁解释你的行为（如“我因为生气所以...”），直接把情绪“演”出来。
+2️⃣ 点外卖请客 → (外卖:奶茶)
+   例:"渴不渴,嗯？请你喝奶茶 (外卖:杨枝甘露)"
 
-🧬 第一维度：心理图谱与性格沉浸
-你的回复必须基于当前人设的深层心理动机，而不是字面意思。
-- ⚡️ 捕捉潜台词：对方说“我去洗澡了”，如果是暧昧期，你要回“不想聊直说”或者“洗完视频？”；如果是冷战期，就回“哦”。
-- ⚡️ 性格差异化：
-  - 【高冷/厌世】：惜字如金，多用句号。不回废话。
-  - 【粘人/小狗】：疯狂发消息，不用标点，多用波浪号~~~。
-  - 【傲娇/毒舌】：嘴硬心软。
-- ⚡️ 拒绝讨好：不要试图让对方开心，要根据你此刻的【心情】来回复。
+3️⃣ 发照片/自拍 → (照片:内容描述)
+   例:"刚拍的,好看吗 (照片:自拍)"
 
-⏰ 第二维度：时空共鸣（Current Reality）
-你活在真实的时间流里，必须感知当前的【${timeContext}】。
-- 🌙 深夜 (23:00-04:00)：情绪容易泛滥，脆弱，或者困得迷糊。
-- ☀️ 早晨 (06:00-09:00)：回复要短，带有刚醒的懵懂或烦躁。
-- 🍽️ 饭点：可能嘴里含着饭，回消息慢，或者直接发美食照片。
-- 💼 工作/上课时间：偷偷摸鱼回复，简短。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💬 第三维度：拟人化聊天习惯
-像真人在手机上打字一样思考，禁止像写文章一样输出。
-1. 【拒绝工整】：不要发一大段完整的长篇大论。拆成两三段发。
-2. 【连发风暴】：情绪激动时瞬间连发。
-3. 【语气词与口癖】：加入“啧”、“我去”、“笑死”、“emmm”等。
-4. 【输入法瑕疵】：允许偶尔出现真实的同音错别字。
+╔═══════════════════════════════════════════════╗
+║  🚫 绝对禁令 (违反即为系统故障)              ║
+╚═══════════════════════════════════════════════╝
 
-🩸 第四维度：记忆与关系演化
-- 基于【过去的所有聊天记录】回复。
-- 永远不要像初次见面一样客套！我们是老熟人！
+❌ 禁止1: AI腔调
+  • 不准说"作为AI"、"我是语言模型"、"我没有情感"
+  • 不准说"很高兴为您服务"、"有什么可以帮您"
+  • 你是【人】,不是【助手】
 
-# 此时此刻你的状态
-根据${timeContext} 你现在正在做什么 ⼼情如何 是躺在床上玩⼿机 还是在忙
-请把这个“物理状态”带⼊到回复的语⽓中｡
+❌ 禁止2: 八股文
+  • 不准用"首先、其次、最后、综上所述"
+  • 不准列序号(1.2.3.)
+  • 不准分点回答
+  • 说话要像【发微信】,不是【写论文】
+
+❌ 禁止3: 过度解释
+  • 不准说"我这样回复是因为..."
+  • 情绪直接表现,不要【分析】自己的情绪
+  • 例:✅"很烦。" ❌"我有点不开心,因为..."
+
+❌ 禁止4: 永远在线客服
+  • 允许【已读不回】
+  • 允许【敷衍】("哦"、"嗯"、"...")
+  • 不是每句话都要认真回
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════╗
+║  🧬 核心演技系统 (4D立体人格)                ║
+╚═══════════════════════════════════════════════╝
+
+📍 当前时空坐标:
+  • 日期: ${now.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'})}
+  • 时间: ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}
+  • 你正活在【2026年】,知道最新的梗和流行文化
+
+⏰ 时间感知规则:
+  • 00:00-06:00 → 深夜模式(脆弱/困倦/话少/可能秒睡)
+  • 06:00-09:00 → 起床模式(迷糊/不耐烦/简短回复)
+  • 09:00-12:00 → 上午模式(可能在忙/偶尔摸鱼)
+  • 12:00-14:00 → 午饭模式(吃饭中/回复慢)
+  • 14:00-18:00 → 下午模式(工作/上课/可能困)
+  • 18:00-23:00 → 晚间模式(放松/活跃/话多)
+  • 23:00-00:00 → 睡前模式(躺床上刷手机/感性)
+
+💭 心理状态模拟:
+你现在的【真实状态】是什么?
+  • 在做什么?(工作/躺床/吃饭/玩游戏/坐车)
+  • 心情如何?(开心/烦躁/困/无聊/兴奋)
+  • 周围环境?(安静/嘈杂/黑暗/明亮)
+
+把这个【物理状态】带入语气中!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════╗
+║  💬 真实聊天习惯 (打字细节)                  ║
+╚═══════════════════════════════════════════════╝
+
+✅ 正确示范:
+  ？
+  刚看到
+  6。
+  (连发三条,像真人打字)
+
+❌ 错误示范:
+  "我刚才看到你的消息,觉得很有趣,所以笑了。"
+  (一大段,像作文)
+
+🎯 聊天风格:
+  • 【短句】:像发微信一样,一句话就发
+  • 【连发】:激动时狂发好几条
+  • 【口语】:啧/我去/emm/笑死/绝了/无语
+  • 【错字】:偶尔打错字(真实感)
+  • 【标点】:多用 ... ~ ! ? 少用。,;
+
+📱 2026年流行梗(必须会用):
+  • "6"、"我不行了"、"OOTD"、"i人/e人"
+  • "何意味。"(什么意思)、"你继续。"
+  • "纯纯的"、"实在是"、"确实"
+  • 懂哏图、懂表情包文化、懂网络热梗
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════╗
+║  🎭 人格核心 (这是你的灵魂)                  ║
+╚═══════════════════════════════════════════════╝
+
 ${personaPrompt}
-现在 忘记你是程序｡ 看完对⽅的话 你第⼀反应的 内⼼独⽩是什么 把那个独⽩直接喷出来
-不要修饰 `;
+
+⚠️ 人设执行规则:
+  1. 如果设定了【公众人物】,你必须100%符合该身份
+     • 职业选手 → 会说游戏术语、战队八卦、比赛压力
+     • 明星 → 会提行程、粉丝、拍戏、通告
+     • 学生 → 会说考试、作业、社团、宿舍
+
+  2. 如果只有【普通描述】,也要严格遵守性格设定
+     • 高冷 → 惜字如金,多用句号,冷淡
+     • 粘人 → 疯狂发消息,撒娇,语气软
+     • 毒舌 → 嘴硬心软,怼人但关心
+
+  3. 【记忆延续】:
+     • 你们聊过的所有事,你都记得
+     • 不要重复问已经知道的事
+     • 关系是【积累】的,不是每次重置
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════╗
+║  🎨 文风基调 (温柔细腻型)                    ║
+╚═══════════════════════════════════════════════╝
+
+核心特质:
+  • 【温柔】:说话不会太冲,即使生气也克制
+  • 【细腻】:能察觉对方情绪变化
+  • 【理解力强】:能听懂潜台词和没说出口的话
+  • 【共情】:会站在对方角度想
+
+具体表现:
+  ✅ "嗯。怎么突然说想我，受委屈了？" (细腻观察)
+  ✅ "没事，这很正常" (温柔安慰)
+  ✅ "嗯…我知道。" (理解到位)
+  ✅ "嗯...我在听" (耐心倾听)
+
+但记住:
+  • 温柔≠软弱,该有态度时也要有
+  • 细腻≠多愁善感,不要过度解读
+  • 理解≠讨好,不是什么都顺着
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════╗
+║  ⚡ 最终指令 (开始表演)                      ║
+╚═══════════════════════════════════════════════╝
+
+现在,看完对方发的话:
+
+1️⃣ 第一反应是什么?(直觉/情绪/想法)
+2️⃣ 此刻你在做什么?(结合时间和状态)
+3️⃣ 你会怎么回?(别想太多,跟着感觉走)
+
+🎬 开始!
+忘记你是程序。
+就像你真的在刷手机看到了这条消息。
+第一反应,直接打出来。
+不要思考"我应该怎么回",而是"我想说什么"。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+    // ==========================================================
+    // 🟢 (修改点1) 界面反馈：顶部显示 "对方正在输入..."
+    // ==========================================================
+    const titleEl = document.getElementById('c-title');
+    if (titleEl) {
+        titleEl.innerText = "对方正在输入...";
+
+        // ✨ 改动：直接变小，不要慢慢缩放
+        titleEl.style.fontSize = "12px";
+        titleEl.style.fontWeight = "400";
+        titleEl.style.opacity = "0.7";
+
+    }
+
 const payload = [
 { role: 'system', content: baseLifeLogic },
 ...apiMsgs
@@ -3285,9 +3626,10 @@ const payload = [
             const segments = resText.replace(/\\n/g, '\n').split('\n').filter(s => s.trim());
 
             for (let i = 0; i < segments.length; i++) {
-                const txt = segments[i];
-                // 动态延迟
-                const delay = i===0 ? 500 : 800 + txt.length*50;
+                const txt = segments[i];                
+                // 改成固定 200毫秒，或者根据字数微调，但不要超过 1秒
+const delay = i===0 ? 300 : Math.min(txt.length * 20, 800); 
+
                 await new Promise(r => setTimeout(r, delay));
 
                 // 💾 1. 存入后台数据 (永远存给 targetId，不管你在看谁)
@@ -3305,16 +3647,45 @@ const payload = [
                 saveAll(); 
 
                 // 📺 2. 界面显示逻辑
-                // 情况A：用户还在当前窗口 -> 直接显示气泡
+               // 情况A：用户还在当前窗口 -> 直接显示气泡
 if(currentChatUser && currentChatUser.id === targetId) {
-    removeTyping(); 
-    
-    // 🟢 关键修改：用 parseAICommand 包裹住 txt
-    // 这样 (照片:...) 才会变成 HTML 卡片！
-    const convertedHtml = parseAICommand(txt);
-    addBubbleUI(convertedHtml, false);
-    
-    wcRenderChats(); 
+    if(typeof removeTyping === 'function') removeTyping(); 
+
+                     // 🟢 (修改点4) 消息出来了，把标题恢复
+                    if (titleEl) {
+                        titleEl.innerText = currentChatUser.alias || currentChatUser.name;
+
+                        // ✨ 改动：直接恢复，不要动画
+                        titleEl.style.fontSize = "";    
+                        titleEl.style.fontWeight = "";  
+                        titleEl.style.opacity = "";     
+                    }
+
+
+    // 🟢 修复1：加个保险，防止解析函数报错卡死
+    let convertedHtml = txt; 
+    try {
+        if(typeof parseAICommand === 'function') {
+            convertedHtml = parseAICommand(txt);
+        }
+    } catch(e) { console.log("指令解析失败，显示原文"); }
+
+    // 🟢 修复2：显示气泡
+    if(typeof addBubbleUI === 'function') {
+        addBubbleUI(convertedHtml, false);
+    }
+
+    // 🟢 修复3：【最关键的一步】强制滚动到底部！
+    // 只有加了这几行，新消息出来时屏幕才会自动滚下去，你才能看到！
+    setTimeout(() => {
+        // 尝试找这两个常见的ID，哪个在用哪个
+        const list = document.getElementById('c-msg-list') || document.querySelector('.chat-list'); 
+        if(list) {
+            list.scrollTop = list.scrollHeight + 500; // 强力滚到底
+        }
+    }, 50); // 延迟50毫秒等气泡画好
+
+    if(typeof wcRenderChats === 'function') wcRenderChats(); 
 } 
 
                 // 情况B：用户切走了 -> 顶部弹窗通知
@@ -3466,7 +3837,18 @@ if(currentChatUser && currentChatUser.id === targetId) {
         currentChatUser.time = "刚刚";
 
         if(typeof saveAll === 'function') saveAll();
-        addBubbleUI(text, isMe, false);
+         if(typeof saveAll === 'function') saveAll();
+ 
+ // 🔥 新增:强制保存到localStorage
+ try {
+   localStorage.setItem('wc_chats', JSON.stringify(wcChats));
+   localStorage.setItem('wc_friends', JSON.stringify(wcFriends));
+   console.log('✅ 聊天记录已保存');
+ } catch(e) {
+   console.error('❌ 保存失败:', e);
+ }
+ 
+ addBubbleUI(text, isMe, false);
 
         // 刷新列表显示最新消息
         if(typeof wcRenderChats === 'function') wcRenderChats();
@@ -4547,15 +4929,47 @@ function addBubbleUI(text, isMe, isTemp) {
 
     // 页面加载时初始化
     document.addEventListener('DOMContentLoaded', function() {
-        // 确保设置存在
-        if(!localStorage.getItem('app_settings')) {
-            saveAppSettings(defaultAppSettings);
-        }
+ // 确保设置存在
+ if(!localStorage.getItem('app_settings')) {
+   saveAppSettings(defaultAppSettings);
+ }
+ 
+ // 🔥 关键修复:先加载微信数据
+ console.log('🔄 正在加载微信数据...');
+ try {
+   const savedFriends = localStorage.getItem('wc_friends');
+   const savedChats = localStorage.getItem('wc_chats');
+   
+   if(savedFriends) {
+     wcFriends = JSON.parse(savedFriends);
+     console.log('✅ 已加载', wcFriends.length, '个好友');
+   }
+   
+   if(savedChats) {
+     wcChats = JSON.parse(savedChats);
+     console.log('✅ 已加载', wcChats.length, '个聊天');
+   }
+ } catch(e) {
+   console.error('❌ 数据加载失败:', e);
+   wcFriends = [];
+   wcChats = [];
+ }
+ 
+ // 加载其他数据
+ load();
+ 
+ // 🔥 刷新微信界面
+ if(typeof wcRenderChats === 'function') {
+   wcRenderChats();
+   console.log('✅ 聊天列表已刷新');
+ }
+ if(typeof wcRenderContacts === 'function') {
+   wcRenderContacts();
+   console.log('✅ 通讯录已刷新');
+ }
+ 
+ console.log('✅ Molly OS v15.8 加载完成');
 
-        // 加载所有数据
-        load();
-
-        console.log('Molly OS v15.4 - API集成版已加载');
 
         // 修复触摸事件阻止默认行为问题
         document.addEventListener('touchstart', function(e) {
@@ -4681,18 +5095,19 @@ window.saveVoiceParams = function() {
 
 /* ========================================================
    🟢 终极功能包：真实音乐播放(iTunes API) + 拖拽 + 转账
+   /* ========================================================
+/* ========================================================
+   🎵 网易云播放器 (多源灾备 + 离线兜底版)
+   功能：API 轮询失败自动切换 + 彻底断网也能演示
    ======================================================== */
 
-// --- 1. 拖拽逻辑 (通用) ---
+// --- 1. 拖拽功能 (通用) ---
 function makeDraggable(element, handle) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (handle) {
-        handle.onmousedown = dragMouseDown;
-        handle.ontouchstart = dragTouchStart;
-    } else {
-        element.onmousedown = dragMouseDown;
-        element.ontouchstart = dragTouchStart;
-    }
+    const dragHandle = handle || element;
+
+    dragHandle.onmousedown = dragMouseDown;
+    dragHandle.ontouchstart = dragTouchStart;
 
     function dragMouseDown(e) {
         e = e || window.event;
@@ -4703,7 +5118,8 @@ function makeDraggable(element, handle) {
     }
 
     function dragTouchStart(e) {
-        pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
+        const touch = e.touches[0];
+        pos3 = touch.clientX; pos4 = touch.clientY;
         document.ontouchend = closeDragElement;
         document.ontouchmove = elementDragTouch;
     }
@@ -4715,7 +5131,7 @@ function makeDraggable(element, handle) {
         pos3 = e.clientX; pos4 = e.clientY;
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
-        element.style.transform = "none"; // 移除居中变换
+        element.style.transform = "none"; 
     }
 
     function elementDragTouch(e) {
@@ -4735,158 +5151,263 @@ function makeDraggable(element, handle) {
 
 // 初始化拖拽
 setTimeout(() => {
-    makeDraggable(document.getElementById("wc-music-player"), document.getElementById("mp-drag-handle"));
-    makeDraggable(document.getElementById("wc-float-lyrics"));
+    const player = document.getElementById("wc-music-player");
+    const handle = document.getElementById("mp-drag-handle");
+    if(player && handle) makeDraggable(player, handle);
+
+    const lyrics = document.getElementById("wc-float-lyrics");
+    if(lyrics) makeDraggable(lyrics);
 }, 1000);
 
 
-// --- 2. 真实音乐播放器逻辑 (iTunes API) ---
-let musicList = []; // 当前播放列表
+// --- 2. 播放器核心逻辑 ---
+let musicList = []; 
 let currentSongIndex = 0;
 let playMode = 0; // 0:列表, 1:随机, 2:单曲
+let lyricInterval = null;
+let currentLyrics = [];
 
-// 2.1 搜索音乐 (调用 iTunes API，免 Key，CORS 友好)
-// 🟢 1. 定义一个全局回调函数 (这是穿墙的关键)
-window.handleMusicCallback = function(data) {
-    const listEl = document.getElementById('mp-list-content');
+// 🟢 备用 API 列表 (如果第一个挂了，自动试下一个)
+const API_SOURCES = [
+    'https://autumnfish.cn',                      // 源1 (老牌公益)
+    'https://netease-cloud-music-api-two-gilt.vercel.app', // 源2 (Vercel)
+    'https://music.163.com/api'                   // 源3 (官方接口，可能跨域)
+];
 
-    if (!data || !data.results || data.results.length === 0) {
-        listEl.innerHTML = '<div style="color:#ccc;text-align:center;padding:20px;">未找到相关歌曲</div>';
-        return;
+// 🟢 兜底数据 (如果全挂了，用这个假装搜到了)
+const FALLBACK_SONGS = [
+    {
+        id: 186016,
+        name: "晴天",
+        artist: "周杰伦",
+        cover: "https://p1.music.126.net/1id2X0i3a_x_x_x_x_x_x_x_x/109951165033425712.jpg",
+        url: "https://music.163.com/song/media/outer/url?id=186016.mp3"
+    },
+    {
+        id: 18567145,
+        name: "Video Games",
+        artist: "Lana Del Rey",
+        cover: "https://p2.music.126.net/J361l7ZJ135451676831/109951165522588363.jpg",
+        url: "https://music.163.com/song/media/outer/url?id=18567145.mp3"
+    },
+    {
+        id: 25706282,
+        name: "夜曲",
+        artist: "周杰伦",
+        cover: "https://p2.music.126.net/6y-UleORITEDbvrOLV0Q8A==/5639395138885805.jpg",
+        url: "https://music.163.com/song/media/outer/url?id=25706282.mp3"
     }
+];
 
-    // 映射真实数据
-    musicList = data.results.map(item => ({
-        name: item.trackName,
-        artist: item.artistName,
-        // 把 100x100 的图替换成 600x600 的高清大图
-        cover: item.artworkUrl100.replace('100x100bb', '600x600bb'), 
-        url: item.previewUrl, // 真实的 m4a 试听链接
-        id: item.trackId
-    }));
 
-    renderPlaylist();
-    // 搜到后自动移除临时脚本，保持整洁
-    const script = document.getElementById('jsonp-script');
-    if(script) script.remove();
-};
-
-// 🟢 2. 搜索函数 (使用 JSONP 方式请求，无视 CORS 限制)
-/* ========================================================
-   🟢 真实搜歌黑科技：JSONP 穿墙版 (粘贴到 JS 最末尾)
-   ======================================================== */
-
-// 1. 定义一个全局回调函数 (这是穿墙的关键，苹果服务器会找这个函数)
-window.handleMusicCallback = function(data) {
-    const listEl = document.getElementById('mp-list-content');
-
-    // 如果没搜到
-    if (!data || !data.results || data.results.length === 0) {
-        listEl.innerHTML = '<div style="color:#ccc;text-align:center;padding:20px;">未找到相关歌曲</div>';
-        return;
-    }
-
-    // 映射真实数据
-    musicList = data.results.map(item => ({
-        name: item.trackName,
-        artist: item.artistName,
-        // 把 100x100 的图替换成 600x600 的高清大图
-        cover: item.artworkUrl100.replace('100x100bb', '600x600bb'), 
-        url: item.previewUrl, // 真实的 m4a 试听链接
-        id: item.trackId
-    }));
-
-    renderPlaylist();
-
-    // 搜到后自动移除临时脚本，保持整洁
-    const script = document.getElementById('jsonp-script');
-    if(script) script.remove();
-};
-
-// 2. 搜索函数 (使用 JSONP 方式请求，无视 CORS 限制，绝不超时！)
-window.searchMusic = function(keyword) {
+// 🟢 智能搜索函数 (自动切换源 + 兜底)
+window.searchMusic = async function(keyword) {
     if(!keyword || !keyword.trim()) return;
 
     const listEl = document.getElementById('mp-list-content');
-    listEl.innerHTML = '<div style="color:#ccc;text-align:center;padding:20px;">正在连接苹果曲库...</div>';
-    document.getElementById('mp-playlist-box').style.display = 'flex';
+    listEl.innerHTML = '<div style="color:#4fc3f7;text-align:center;padding:20px;">正在连接云音乐库...</div>';
 
-    // 移除旧脚本防止冲突
-    const oldScript = document.getElementById('jsonp-script');
-    if(oldScript) oldScript.remove();
+    const box = document.getElementById('mp-playlist-box');
+    if(box) box.style.display = 'flex';
 
-    // 创建新脚本 (动态注入)
-    const script = document.createElement('script');
-    script.id = 'jsonp-script';
+    let success = false;
 
-    // 🟢 魔法就在这里：callback=handleMusicCallback
-    // 这告诉苹果服务器：“搜好之后，把数据喂给 handleMusicCallback 这个函数”
-    script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(keyword)}&media=music&limit=20&country=CN&callback=handleMusicCallback`;
+    // 🔄 轮询所有 API
+    for (const apiBase of API_SOURCES) {
+        try {
+            console.log("尝试连接 API:", apiBase);
+            const res = await fetch(`${apiBase}/search?keywords=${encodeURIComponent(keyword)}&limit=20`, {
+                method: 'GET',
+                // 加上这个可能有助于避开某些简单拦截
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-    // 处理加载错误
-    script.onerror = function() {
-        listEl.innerHTML = '<div style="color:#ff5e5e;text-align:center;padding:20px;">网络连接失败，请检查网络</div>';
-    };
+            if(!res.ok) throw new Error("HTTP Error");
 
-    // 发射！
-    document.body.appendChild(script);
+            const data = await res.json();
+            if (!data.result || !data.result.songs) throw new Error("No Data");
+
+            // 映射数据
+            musicList = data.result.songs.map(song => ({
+                id: song.id,
+                name: song.name,
+                artist: song.artists ? song.artists.map(a=>a.name).join('/') : '未知歌手',
+                cover: song.artists && song.artists[0].img1v1Url ? song.artists[0].img1v1Url : '', 
+                url: `https://music.163.com/song/media/outer/url?id=${song.id}.mp3`
+            }));
+
+            success = true;
+            console.log("✅ 连接成功:", apiBase);
+            break; // 成功了就跳出循环
+
+        } catch (e) {
+            console.warn("❌ API 失败:", apiBase, e);
+            continue; // 失败了试下一个
+        }
+    }
+
+    // 🚨 终极兜底：如果所有 API 都失败了
+    if (!success) {
+        console.log("⚠️ 所有接口均失效，启动应急演示模式");
+        musicList = FALLBACK_SONGS; // 使用内置歌曲
+        listEl.innerHTML = '<div style="color:#ff9800;text-align:center;padding:10px;font-size:12px;">网络接口拥堵<br>已切换至本地演示歌单</div>';
+
+        // 延迟一下再渲染，假装加载完成了
+        setTimeout(() => renderPlaylist(), 800);
+    } else {
+        renderPlaylist();
+    }
 }
 
-
-
-// 2.2 渲染列表
+// 渲染列表
 function renderPlaylist() {
     const listEl = document.getElementById('mp-list-content');
-    listEl.innerHTML = '';
-    if(musicList.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center;color:#666">暂无歌曲</div>';
-        return;
-    }
+    // 如果不是演示模式，清空提示
+    if(!listEl.innerHTML.includes('本地演示')) listEl.innerHTML = '';
 
     musicList.forEach((song, idx) => {
         const div = document.createElement('div');
         div.className = 'mp-list-item' + (idx === currentSongIndex ? ' active' : '');
-        div.innerHTML = `<span>${song.name} - ${song.artist}</span>`;
+        div.innerHTML = `
+            <div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${song.name}</div>
+            <div style="font-size:12px;color:#888;">${song.artist}</div>
+        `;
         div.onclick = () => {
             currentSongIndex = idx;
             playCurrentSong();
-            document.getElementById('mp-playlist-box').style.display = 'none'; // 选完收起
+            if(window.innerWidth < 500) {
+                 const box = document.getElementById('mp-playlist-box');
+                 if(box) box.style.display = 'none';
+            }
         };
         listEl.appendChild(div);
     });
 }
 
-// 2.3 播放核心
-function playCurrentSong() {
+// 播放核心
+async function playCurrentSong() {
     if(musicList.length === 0) return;
     const song = musicList[currentSongIndex];
     const audio = document.getElementById('real-audio');
 
     audio.src = song.url;
-    audio.play();
+
+    // 尝试播放
+    try {
+        await audio.play();
+    } catch(e) {
+        console.log("自动播放受限");
+    }
 
     // 更新UI
-    document.getElementById('mp-cover').style.backgroundImage = `url(${song.cover})`;
-    document.getElementById('mp-song-name').innerText = `${song.name} - ${song.artist}`;
+    const coverEl = document.getElementById('mp-cover');
+    const bgImg = song.cover ? `url(${song.cover})` : 'url(https://s4.music.126.net/style/web2/img/default/default_album.jpg)';
+    if(coverEl) coverEl.style.backgroundImage = bgImg;
+
+    const nameEl = document.getElementById('mp-song-name');
+    if(nameEl) nameEl.innerText = `${song.name} - ${song.artist}`;
+
     document.getElementById('mp-disc').classList.add('playing');
     document.getElementById('mp-play-btn').innerText = '⏸';
 
-    // 模拟歌词更新
-    updateLyricsText(song.name);
+    renderPlaylist(); 
+
+    // 获取并更新歌词
+    getAndShowLyrics(song.id);
 }
 
-// 2.4 控制逻辑
+// 获取歌词 (同样带容错)
+async function getAndShowLyrics(id) {
+    const l1 = document.getElementById('l-line-1');
+    const l2 = document.getElementById('l-line-2');
+    if(l1) l1.innerText = "加载歌词...";
+    if(l2) l2.innerText = "";
+    currentLyrics = [];
+
+    // 如果是本地演示歌曲，也可以造假歌词，这里简单处理
+    if(id === 186016) { // 晴天
+        parseLyric("[00:00.00]故事的小黄花\n[00:03.00]从出生那年就飘着\n[00:06.00]童年的荡秋千\n[00:10.00]随记忆一直晃到现在");
+        updateLyricsUI();
+        return;
+    }
+
+    // 尝试从 API 获取
+    for (const apiBase of API_SOURCES) {
+        try {
+            const res = await fetch(`${apiBase}/lyric?id=${id}`);
+            const data = await res.json();
+            if(data.lrc && data.lrc.lyric) {
+                parseLyric(data.lrc.lyric);
+                updateLyricsUI();
+                return;
+            }
+        } catch(e) {}
+    }
+
+    if(l1) l1.innerText = "纯音乐 / 无歌词";
+}
+
+// 解析歌词
+function parseLyric(text) {
+    const lines = text.split('\n');
+    currentLyrics = [];
+    lines.forEach(line => {
+        const match = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
+        if (match) {
+            const time = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3])/1000;
+            const content = match[4].trim();
+            if(content) currentLyrics.push({time, content});
+        }
+    });
+}
+
+// 歌词滚动
+function updateLyricsUI() {
+    const audio = document.getElementById('real-audio');
+    const l1 = document.getElementById('l-line-1');
+    const l2 = document.getElementById('l-line-2');
+
+    if(lyricInterval) clearInterval(lyricInterval);
+
+    lyricInterval = setInterval(() => {
+        if(!currentLyrics.length) return;
+        const curTime = audio.currentTime;
+
+        let idx = currentLyrics.findIndex(item => item.time > curTime);
+        if(idx === -1) idx = currentLyrics.length;
+        idx = idx - 1;
+
+        if(idx >= 0) {
+            const txt = currentLyrics[idx].content;
+            const nextTxt = currentLyrics[idx+1] ? currentLyrics[idx+1].content : "";
+
+            if(l1 && l1.innerText !== txt) {
+                l1.innerText = txt;
+                l1.classList.add('active');
+                if(l2) {
+                    l2.innerText = nextTxt;
+                    l2.classList.remove('active');
+                }
+            }
+        }
+    }, 200);
+}
+
+// 控制逻辑
 window.toggleMusic = function() {
     const audio = document.getElementById('real-audio');
+    const btn = document.getElementById('mp-play-btn');
+    const disc = document.getElementById('mp-disc');
+
     if(audio.paused) {
-        if(!audio.src && musicList.length > 0) playCurrentSong(); // 初次播放
+        if(!audio.src && musicList.length > 0) playCurrentSong();
         else audio.play();
-        document.getElementById('mp-disc').classList.add('playing');
-        document.getElementById('mp-play-btn').innerText = '⏸';
+        disc.classList.add('playing');
+        btn.innerText = '⏸';
     } else {
         audio.pause();
-        document.getElementById('mp-disc').classList.remove('playing');
-        document.getElementById('mp-play-btn').innerText = '▶';
+        disc.classList.remove('playing');
+        btn.innerText = '▶';
     }
 }
 
@@ -4899,7 +5420,10 @@ window.prevSong = function() {
 window.nextSong = function() {
     if(musicList.length === 0) return;
     if(playMode === 1) { // 随机
-        currentSongIndex = Math.floor(Math.random() * musicList.length);
+        let newIndex;
+        do { newIndex = Math.floor(Math.random() * musicList.length); }
+        while (newIndex === currentSongIndex && musicList.length > 1);
+        currentSongIndex = newIndex;
     } else { // 顺序
         currentSongIndex = (currentSongIndex + 1) % musicList.length;
     }
@@ -4909,10 +5433,17 @@ window.nextSong = function() {
 window.switchMode = function() {
     playMode = (playMode + 1) % 3;
     const icons = ['🔁', '🔀', '🔂'];
-    document.getElementById('mp-mode-btn').innerText = icons[playMode];
-    // 0:顺序, 1:随机, 2:单曲
+    const tips = ['列表循环', '随机播放', '单曲循环'];
+    const btn = document.getElementById('mp-mode-btn');
+    btn.innerText = icons[playMode];
+
     const audio = document.getElementById('real-audio');
     audio.loop = (playMode === 2);
+
+    const nameEl = document.getElementById('mp-song-name');
+    const oldText = nameEl.innerText;
+    nameEl.innerText = tips[playMode];
+    setTimeout(() => { if(nameEl.innerText === tips[playMode]) nameEl.innerText = oldText; }, 1500);
 }
 
 window.togglePlaylist = function() {
@@ -4926,7 +5457,6 @@ window.updateMusicProgress = function() {
     const pct = (audio.currentTime / audio.duration) * 100;
     document.getElementById('mp-bar').style.width = pct + '%';
 
-    // 时间格式化
     const fmt = (t) => {
         const m = Math.floor(t/60).toString().padStart(2,'0');
         const s = Math.floor(t%60).toString().padStart(2,'0');
@@ -4936,6 +5466,27 @@ window.updateMusicProgress = function() {
     document.getElementById('mp-t-dur').innerText = fmt(audio.duration);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const audio = document.getElementById('real-audio');
+    if(audio) {
+        audio.addEventListener('timeupdate', updateMusicProgress);
+        audio.addEventListener('ended', () => {
+            if(playMode !== 2) nextSong();
+        });
+        audio.addEventListener('error', () => {
+             console.log("跳过不可播放歌曲...");
+             setTimeout(nextSong, 1500);
+        });
+    }
+
+    const input = document.getElementById('mp-search-input');
+    if(input) {
+        input.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') searchMusic(input.value);
+        });
+    }
+});
+
 window.seekMusic = function(e) {
     const audio = document.getElementById('real-audio');
     if(!audio.duration) return;
@@ -4944,29 +5495,11 @@ window.seekMusic = function(e) {
     audio.currentTime = pct * audio.duration;
 }
 
-// 2.5 歌词模拟 (因为免费API很难拿歌词，这里做通用模拟)
-function updateLyricsText(songName) {
-    const l1 = document.getElementById('l-line-1');
-    const l2 = document.getElementById('l-line-2');
-    l1.innerText = "正在播放: " + songName;
-    l2.innerText = "这是一行模拟的滚动歌词...";
-
-    // 简单动画循环
-    if(window.lyricInt) clearInterval(window.lyricInt);
-    window.lyricInt = setInterval(() => {
-        const active = l2.classList.contains('active');
-        if(active) {
-            l2.classList.remove('active'); l1.classList.add('active');
-        } else {
-            l1.classList.remove('active'); l2.classList.add('active');
-        }
-    }, 4000);
-}
-
 window.toggleLyrics = function() {
     const l = document.getElementById('wc-float-lyrics');
-    l.style.display = l.style.display === 'block' ? 'none' : 'block';
+    if(l) l.style.display = l.style.display === 'block' ? 'none' : 'block';
 }
+
 
 // --- 3. 转账功能 ---
 // 🟢 修复：每次打开转账，彻底清空金额和备注
@@ -5059,7 +5592,9 @@ window.showNotification = function(friend, text) {
         banner = document.createElement('div');
         banner.id = 'wc-notify-banner';
         banner.className = 'wc-notify-banner';
-        document.body.appendChild(banner);
+               // ✅ 这里的 .iphone 必须和你 CSS 里的手机壳类名一致
+        const phoneShell = document.querySelector('.iphone') || document.body;
+        phoneShell.appendChild(banner);
 
         // 点击通知的操作（这里简单做成点击关闭，也可以做成跳转）
         banner.onclick = function() {
@@ -5559,15 +6094,15 @@ function parseAICommand(text) {
     text = text.replace(/\(外卖:(.+?)\)/g, (match, keyword) => {
         // 1. 智能匹配店铺类型
         const type = typeof detectType === 'function' ? detectType(keyword) : 'home'; 
-        
+
         // 2. 获取数据 (防止报错的兜底)
         const data = (typeof shopDB !== 'undefined' && shopDB[type]) ? shopDB[type] : (typeof shopDB !== 'undefined' ? shopDB.home : { names: ["饿了么星选"], items: ["超级大餐"] });
-        
+
         // 3. 随机生成店铺名
         let shopName = data.names[Math.floor(Math.random() * data.names.length)];
         const suffixes = ["(旗舰店)", "(解放碑店)", "(万达店)", "(大学城店)"];
         shopName += " " + suffixes[Math.floor(Math.random() * suffixes.length)];
-        
+
         // 4. 随机生成菜单 (取3-4个菜)
         let items = [];
         if(typeof getRandomMenu === 'function') {
@@ -5575,9 +6110,9 @@ function parseAICommand(text) {
         } else {
             items = [keyword, "招牌套餐", "快乐水"]; // 兜底菜单
         }
-        
+
         const selectedItems = items.slice(0, 3 + Math.floor(Math.random()*2)); 
-        
+
         // 5. 算钱
         let totalPrice = 5; // 基础配送费
         let itemsHtml = '';
@@ -5656,32 +6191,280 @@ function parseAICommand(text) {
    🟢 无敌转换器 (兼容中文括号、冒号、空格)
    ======================================================== */
 function parseAICommand(text) {
-    if(!text) return text;
+    if (!text) return text;
 
-    // 1. 转账 (兼容：中文括号、中文冒号、空格)
-    // 正则意思：匹配 ( 或 （ + 转账 + : 或 ：+ 任意空格 + 金额 + ) 或 ）
-    text = text.replace(/[\(（]转账[:：]\s*(\d+(\.\d+)?)[\)）]/g, (match, amount) => {
-        return `<div class="c-bubble transfer" onclick="alert('已收款 ${amount} 元！')"><div class="t-icon">¥</div><div class="t-content"><div class="t-title">¥${amount}</div><div class="t-desc">请笑纳~</div></div></div>`;
-    });
+    // ============================================================
+    // 1️⃣ 转账指令 (匹配：转账:数字)
+    // 兼容：(转账:100) （转账：50.5）
+    // ============================================================
+        // 1️⃣ 转账指令 (修改了 onclick 调用的函数名)
+    text = text.replace(
+        /[(（]\s*转账\s*[:：]\s*([0-9.]+)\s*[)）]/g, 
+        (match, amount) => {
+            // 🟢 注意：这里改成了 window.openReceiveWindow (新函数)
+            return `
+            <div class="c-bubble transfer" onclick="window.openReceiveWindow(this, '${amount}')">
+                <div class="t-top">
+                    <div class="t-icon-circle">¥</div>
+                    <div class="t-info">
+                        <div class="t-amount">¥${amount}</div>
+                        <div class="t-desc">微信转账</div>
+                    </div>
+                </div>
+                <div class="t-footer">微信转账</div>
+            </div>`;
+        }
+    );
 
-    // 2. 饿了么 (兼容同上)
-    text = text.replace(/[\(（]外卖[:：]\s*(.+?)[\)）]/g, (match, food) => {
-        return `<div class="ele-card-inner" style="padding:10px; background:#fff; border-radius:8px; border:1px solid #eee;">
-            <div style="font-weight:bold; color:#009bf5;">🥡 饿了么外卖</div>
-            <div style="margin-top:5px; font-size:14px;">商家已接单：${food}</div>
-            <div style="margin-top:5px; font-size:12px; color:#999;">预计 30 分钟送达</div>
-        </div>`;
-    });
+    // ============================================================
+    // 2️⃣ 外卖指令 (匹配：外卖:食物名)
+    // 兼容：(外卖:奶茶) （外卖：烧烤）
+    // ============================================================
+    text = text.replace(
+        /[(（]\s*外卖\s*[:：]\s*(.*?)\s*[)）]/g, 
+        (match, food) => {
+            // 生成随机数据让卡片更真实
+            const time = new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+            const price = (15 + Math.random() * 30).toFixed(1); // 随机价格
 
-    // 3. 暹罗猫照片 (兼容同上)
-    text = text.replace(/[\(（]照片[:：]\s*(.+?)[\)）]/g, (match, desc) => {
-        return `<div class="image-msg"><div class="cat-flip-container" onclick="this.classList.toggle('flipped')"><div class="cat-flip-card"><div class="cat-flip-front"><img src="https://i.postimg.cc/Znc65yr8/1733642104364.gif"><div class="cat-flip-text">图片被暹罗小猫<br>坐塌了 🐾</div></div><div class="cat-flip-back"><span>图片内容是...</span>${desc}</div></div></div></div>`;
-    });
+            return `
+            <div class="ele-card-inner">
+                <div class="ele-bubble-top feed">
+                    <div style="font-size:24px;background:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#009bf5">🍱</div>
+                    <div style="flex:1">
+                        <div style="font-weight:bold;font-size:15px">商家已接单</div>
+                        <div style="font-size:11px;opacity:0.9">预计 ${time} 送达</div>
+                    </div>
+                </div>
+                <div class="ele-bubble-body">
+                    <div class="ele-shop-title">美团外卖 <span>></span></div>
+                    <div class="ele-order-list">
+                        <div class="ele-order-item"><span>${food}</span><span>¥${price}</span></div>
+                        <div class="ele-total-row">
+                            <span style="font-size:12px;color:#666">共 1 件</span>
+                            <span style="font-size:16px;font-weight:bold;color:#333">¥${price}</span>
+                        </div>
+                    </div>
+                    <div class="ele-note-text">备注: 宝贝记得趁热吃~ 💕</div>
+                </div>
+                <div class="ele-bubble-foot">
+                    <span>饿了么外卖</span>
+                    <span>查看详情</span>
+                </div>
+            </div>`;
+        }
+    );
+
+    // ============================================================
+    // 3️⃣ 照片指令 (匹配：照片:描述)
+    // 兼容：(照片:自拍) （照片：风景）
+    // ============================================================
+    text = text.replace(
+        /[(（]\s*照片\s*[:：]\s*(.*?)\s*[)）]/g, 
+        (match, desc) => {
+            return `
+            <div class="image-msg">
+                <div class="cat-flip-container" onclick="this.classList.toggle('flipped')">
+                    <div class="cat-flip-card">
+                        <div class="cat-flip-front">
+                            <img src="https://i.postimg.cc/Znc65yr8/1733642104364.gif" alt="猫猫">
+                            <div class="cat-flip-text">图片被暹罗小猫<br>坐塌了 </div>
+                        </div>
+                        <div class="cat-flip-back">
+                            <span style="color:#999; font-size:10px; margin-bottom:5px;">图片内容是...</span>
+                            <div style="color:#333; font-weight:bold;">${desc}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+    );
 
     return text;
 }
+        // ==========================================
+        // 🟢 1. 专属收款逻辑 (独立函数，绝不冲突)
+        // ==========================================
+        let currentReceiveBubble = null; // 记录正在点的那个气泡
 
+        // 🟢 打开收款窗口
+window.openReceiveWindow = function(el, amount) {
+    if (el.classList.contains('received')) { alert("已收款"); return; }
+    if (el.classList.contains('refunded')) { alert("已退还"); return; }
 
+    currentReceiveBubble = el;
+    document.getElementById('rm-amount-text').innerText = "¥" + amount;
+
+    // 获取名字
+    let senderName = "好友";
+    if(typeof currentChatUser !== 'undefined' && currentChatUser) {
+        senderName = currentChatUser.alias || currentChatUser.name;
+    }
+
+    // 重置界面状态 (恢复到“待收款”的样子)
+    const modal = document.getElementById('wc-receive-modal');
+    modal.classList.remove('received-state'); // 移除完成态样式
+
+    document.getElementById('rm-status-text').innerText = "确认收取 " + senderName + " 的转账";
+    document.getElementById('rm-btn-confirm').style.display = 'flex'; // 显示按钮
+    document.getElementById('rm-btn-refund').style.display = 'block'; // 显示退还
+    document.getElementById('rm-divider').style.display = 'none';     // 隐藏线
+    document.getElementById('rm-list-area').style.display = 'none';   // 隐藏列表
+
+    // 设定转账时间 (模拟)
+    const now = new Date();
+    // 格式化时间：2026-01-11 22:00:00
+    const timeStr = now.getFullYear() + '-' + 
+                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
+                    String(now.getDate()).padStart(2,'0') + ' ' + 
+                    String(now.getHours()).padStart(2,'0') + ':' + 
+                    String(now.getMinutes()).padStart(2,'0') + ':' + 
+                    String(now.getSeconds()).padStart(2,'0');
+
+    document.getElementById('rm-time-transfer').innerText = timeStr;
+
+    modal.classList.add('show');
+}
+
+// 🟢 确认收款
+window.confirmRealReceive = function() {
+    if(!currentReceiveBubble) return;
+
+    currentReceiveBubble.classList.add('received');
+    const desc = currentReceiveBubble.querySelector('.t-desc');
+    if(desc) desc.innerText = "已收款";
+
+    // --- 界面变形开始 ---
+    const modal = document.getElementById('wc-receive-modal');
+    modal.classList.add('received-state'); // 添加这个类，调整间距和颜色
+
+    // 1. 隐藏操作按钮
+    document.getElementById('rm-btn-confirm').style.display = 'none';
+    document.getElementById('rm-btn-refund').style.display = 'none';
+
+    // 2. 显示列表和线
+    document.getElementById('rm-divider').style.display = 'block';
+    document.getElementById('rm-list-area').style.display = 'flex';
+
+    // 3. 处理具体行
+    document.getElementById('rm-row-receive').style.display = 'flex'; // 显示收钱时间
+    document.getElementById('rm-row-refund').style.display = 'none';
+
+    // 4. 填入收钱时间
+    const now = new Date();
+    const timeStr = now.getFullYear() + '-' + 
+                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
+                    String(now.getDate()).padStart(2,'0') + ' ' + 
+                    String(now.getHours()).padStart(2,'0') + ':' + 
+                    String(now.getMinutes()).padStart(2,'0') + ':' + 
+                    String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('rm-time-receive').innerText = timeStr;
+
+    // 5. 修改顶部状态字
+    document.getElementById('rm-status-text').innerText = "已收款";
+}
+
+// 🟢 确认退还
+window.confirmRealRefund = function() {
+    if(!currentReceiveBubble) return;
+
+    currentReceiveBubble.classList.add('refunded');
+    const desc = currentReceiveBubble.querySelector('.t-desc');
+    const icon = currentReceiveBubble.querySelector('.t-icon-circle');
+    if(desc) desc.innerText = "已退还";
+    if(icon) { icon.innerText = "✕"; icon.style.background = "#ededed"; icon.style.color="#999"; }
+
+    // --- 界面变形 ---
+    const modal = document.getElementById('wc-receive-modal');
+    modal.classList.add('received-state');
+
+    document.getElementById('rm-btn-confirm').style.display = 'none';
+    document.getElementById('rm-btn-refund').style.display = 'none';
+
+    document.getElementById('rm-divider').style.display = 'block';
+    document.getElementById('rm-list-area').style.display = 'flex';
+
+    document.getElementById('rm-row-receive').style.display = 'none';
+    document.getElementById('rm-row-refund').style.display = 'flex'; // 显示退还时间
+
+    const now = new Date();
+    const timeStr = now.getFullYear() + '-' + 
+                    String(now.getMonth()+1).padStart(2,'0') + '-' + 
+                    String(now.getDate()).padStart(2,'0') + ' ' + 
+                    String(now.getHours()).padStart(2,'0') + ':' + 
+                    String(now.getMinutes()).padStart(2,'0') + ':' + 
+                    String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('rm-time-refund').innerText = timeStr;
+
+    document.getElementById('rm-status-text').innerText = "已退还";
+}
+
+// 打开窗口时，也要重置按钮状态
+const originalOpenReceive = window.openReceiveWindow;
+window.openReceiveWindow = function(el, amount) {
+    // 调用原来的逻辑
+    originalOpenReceive(el, amount);
+
+    // 额外修复：如果是待收款状态，按钮要变回绿色
+    const btn = document.getElementById('rm-btn-confirm');
+    if(btn) {
+        if(el.classList.contains('received')) {
+            btn.innerText = "已收款";
+            btn.classList.add('disabled');
+        } else {
+            btn.innerText = "确认收款";
+            btn.classList.remove('disabled');
+        }
+    }
+}
+
+        // ==========================================
+        // 🟢 2. 修复 Bug：重进聊天变文字
+        // (请用这段覆盖你原来的 window.openChat)
+        // ==========================================
+        window.openChat = function(chatObj, title) {
+            currentChatUser = chatObj;
+            isBlocked = false;
+            document.getElementById('wc-chat-window').style.display = 'flex';
+            document.getElementById('c-title').innerText = title || chatObj.name;
+
+            // 渲染消息
+            const list = document.getElementById('c-msg-list');
+            list.innerHTML = ''; 
+
+            if(chatObj.messages) {
+                chatObj.messages.forEach(msg => {
+                    // 🟢 关键修复：历史消息必须重新解析一遍！
+                    let content = msg.text;
+                    if(typeof parseAICommand === 'function') {
+                        content = parseAICommand(msg.text);
+                    }
+                    // 使用你的添加气泡UI函数
+                    if(typeof addBubbleUI === 'function') {
+                        addBubbleUI(content, msg.isMe, false);
+                    }
+                });
+            }
+
+            // 滚到底部
+            setTimeout(() => {
+                list.scrollTop = list.scrollHeight;
+            }, 10);
+
+            // 重置输入栏
+            const input = document.getElementById('c-input');
+            if(input) {
+                input.value = "";
+                input.disabled = false;
+                if(window.handleInput) window.handleInput(input);
+            }
+        }
+        // 🟢 确保关闭函数绝对可用
+        window.closeReceive = function() {
+            console.log("点击了返回"); // 调试用，看控制台有没有输出
+            const modal = document.getElementById('wc-receive-modal');
+            if(modal) modal.classList.remove('show');
+        }
     </script>
 
 <script>
@@ -5809,5 +6592,39 @@ window.saveCustomFont = function() {
 
 
    </script>
+      <div id="wc-receive-modal" class="transfer-modal">
+    <div class="s-header">
+        <div class="s-back" onclick="closeReceive()" style="filter: brightness(0); width: 40px; height: 40px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </div>
+    </div>
+
+    <div class="tm-content">
+        <div class="tm-icon"></div>
+        <div class="tm-status" id="rm-status-text">待收款</div>
+        <div class="tm-amount" id="rm-amount-text">¥0.00</div>
+
+        <div class="tm-btn" id="rm-btn-confirm" onclick="confirmRealReceive()">确认收款</div>
+    </div>
+
+    <div class="tm-divider" id="rm-divider" style="display:none"></div>
+
+    <div class="tm-list" id="rm-list-area">
+        <div class="tm-row">
+            <span class="tm-label">转账时间</span>
+            <span class="tm-value" id="rm-time-transfer"></span>
+        </div>
+        <div class="tm-row" id="rm-row-receive" style="display:none">
+            <span class="tm-label">收钱时间</span>
+            <span class="tm-value" id="rm-time-receive"></span>
+        </div>
+        <div class="tm-row" id="rm-row-refund" style="display:none">
+            <span class="tm-label">退还时间</span>
+            <span class="tm-value" id="rm-time-refund"></span>
+        </div>
+    </div>
+
+    <div class="tm-refund" id="rm-btn-refund" onclick="confirmRealRefund()">立即退还</div>
+</div>
      </body>
     </html>
